@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Loadinfo</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ loadInfo.id }}</td>
+            </tr>
+            <tr>
+                <th>Price</th>
+                <td>{{ loadInfo.price }}</td>
+            </tr>
+            <tr>
+                <th>Miles</th>
+                <td>{{ loadInfo.miles }}</td>
+            </tr>
+            <tr>
+                <th>Weight</th>
+                <td>{{ loadInfo.weight }}</td>
+            </tr>
+            <tr>
+                <th>Startaddress</th>
+                <td>{{ loadInfo.startAddress }}</td>
+            </tr>
+            <tr>
+                <th>Endaddress</th>
+                <td>{{ loadInfo.endAddress }}</td>
+            </tr>
+            <tr>
+                <th>Duedate</th>
+                <td>{% if loadInfo.dueDate %}{{ loadInfo.dueDate|date('Y-m-d H:i:s') }}{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('loadinfo_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('loadinfo_edit', { 'id': loadInfo.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

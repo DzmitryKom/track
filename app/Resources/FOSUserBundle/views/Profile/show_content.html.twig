@@ -1,0 +1,20 @@
+{% trans_default_domain 'FOSUserBundle' %}
+<div class="col-sm-12">
+  <div style="margin-left: -10px;">
+    <h1>Profile</h1>
+    <div class="fos_user_user_show">
+      <p>User Name: {{ user.username }}</p>
+      <p>E-mail: {{ user.email }}</p>
+      {% if not user.firstName is empty %}
+        <p>First Name: {{ user.firstName }}</p>
+      {% endif %}
+      {% if not user.lastName is empty %}
+        <p>Last Name: {{ user.lastName }}</p>
+      {% endif %}
+      {% if not user.companyName is empty %}
+        <p>Company: {{ user.companyName }}</p>
+      {% endif %}
+    </div>
+    <a class="btn btn-default" href="{{ path('fos_user_profile_edit') }}">Edit Profile</a>
+  </div>
+</div>

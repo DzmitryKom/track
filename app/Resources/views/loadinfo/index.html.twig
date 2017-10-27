@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Loadinfos list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Price</th>
+                <th>Miles</th>
+                <th>Weight</th>
+                <th>Startaddress</th>
+                <th>Endaddress</th>
+                <th>Duedate</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for loadInfo in loadInfos %}
+            <tr>
+                <td><a href="{{ path('loadinfo_show', { 'id': loadInfo.id }) }}">{{ loadInfo.id }}</a></td>
+                <td>{{ loadInfo.price }}</td>
+                <td>{{ loadInfo.miles }}</td>
+                <td>{{ loadInfo.weight }}</td>
+                <td>{{ loadInfo.startAddress }}</td>
+                <td>{{ loadInfo.endAddress }}</td>
+                <td>{% if loadInfo.dueDate %}{{ loadInfo.dueDate|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('loadinfo_show', { 'id': loadInfo.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('loadinfo_edit', { 'id': loadInfo.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('loadinfo_new') }}">Create a new loadInfo</a>
+        </li>
+    </ul>
+{% endblock %}

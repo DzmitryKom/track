@@ -1,0 +1,61 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+#parameters:
+#    roles: ['ROLE_USER','ROLE_BOARD',ROLE_STAFF]
+
+security:
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt
+
+    role_hierarchy:
+
+        ROLE_STAFF: ROLE_USER
+        ROLE_OWNER: ROLE_MANAGER
+        ROLE_SUPER_ADMIN: ROLE_OWNER
+
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username_email
+
+    firewalls:
+        main:
+
+          remember_me:
+            secret:   '%secret%'
+            lifetime: 80000 # 1 day~ in seconds
+#            # by default, the feature is enabled by checking a
+#            # checkbox in the login form (see below), uncomment the
+#            # following line to always enable it.
+#            always_remember_me: true
+          pattern:   ^/
+          form_login:
+
+              provider: fos_userbundle
+              csrf_token_generator: security.csrf.token_manager
+
+#              login_path: login_form
+#              check_path: login_check
+
+          logout:       true
+          anonymous:    true
+
+#          logout:
+#            path:   logout
+#            target: /
+
+    access_control:
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+
+        - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/loadinfo, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/tracks, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api, role: IS_AUTHENTICATED_ANONYMOUSLY }
+
+
+        - { path: ^/user, role: ROLE_MANAGER }
+        - { path: ^/(.+), role: ROLE_USER }
+
+        - { path: ^/, role: ROLE_USER }
+

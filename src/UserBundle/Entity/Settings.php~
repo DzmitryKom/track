@@ -1,0 +1,141 @@
+<?php
+
+namespace UserBundle\Entity;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Settings
+ *
+ * @ORM\Table(name="settings")
+ * @ORM\Entity(repositoryClass="UserBundle\Repository\SettingsRepository")
+ */
+class Settings
+{
+    public function __construct()
+    {
+        $this->userSettings = new ArrayCollection();
+    }
+
+
+    /**
+     * One Settings has Many UserSettings.
+     * @ORM\OneToMany(targetEntity="UserBundle\Entity\UserSettings", mappedBy="settings")
+     */
+    private $userSettings;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="payType", type="string", length=255, nullable=true)
+     */
+    private $payType;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="payValue", type="string", length=255)
+     */
+    private $payValue;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="isTrackOwner", type="boolean", nullable=true)
+     */
+    private $isTrackOwner;
+
+
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set payType
+     *
+     * @param string $payType
+     *
+     * @return Settings
+     */
+    public function setPayType($payType)
+    {
+        $this->payType = $payType;
+
+        return $this;
+    }
+
+    /**
+     * Get payType
+     *
+     * @return string
+     */
+    public function getPayType()
+    {
+        return $this->payType;
+    }
+
+    /**
+     * Set payValue
+     *
+     * @param string $payValue
+     *
+     * @return Settings
+     */
+    public function setPayValue($payValue)
+    {
+        $this->payValue = $payValue;
+
+        return $this;
+    }
+
+    /**
+     * Get payValue
+     *
+     * @return string
+     */
+    public function getPayValue()
+    {
+        return $this->payValue;
+    }
+
+    /**
+     * Set isTrackOwner
+     *
+     * @param boolean $isTrackOwner
+     *
+     * @return Settings
+     */
+    public function setIsTrackOwner($isTrackOwner)
+    {
+        $this->isTrackOwner = $isTrackOwner;
+
+        return $this;
+    }
+
+    /**
+     * Get isTrackOwner
+     *
+     * @return bool
+     */
+    public function getIsTrackOwner()
+    {
+        return $this->isTrackOwner;
+    }
+}
+

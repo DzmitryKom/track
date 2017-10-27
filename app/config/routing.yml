@@ -1,0 +1,36 @@
+#app_track:
+#    resource: "@AppBundle/Controller/TrackController.php"
+#    type:     annotation
+
+#app_load_info:
+#    resource: "@AppBundle/Controller/LoadInfoController.php"
+#    type:     annotation
+
+user_web:
+    resource: "@UserBundle/Controller/Web"
+    type:     annotation
+    prefix:   /
+
+user_api:
+    resource: "@UserBundle/Controller/Api"
+    type:     annotation
+    prefix:   /
+
+app_web:
+    resource: '@AppBundle/Controller/Web/'
+    type: annotation
+
+app_api:
+    resource: '@AppBundle/Controller/Api/'
+    type: annotation
+
+user_routes:
+  resource: "@FOSUserBundle/Controller"
+  type: annotation
+
+fos_user:
+  resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+
+fos_user_resetting:
+    resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
+    prefix: /resetting
