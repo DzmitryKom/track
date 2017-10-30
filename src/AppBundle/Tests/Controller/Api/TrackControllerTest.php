@@ -30,6 +30,9 @@ class TrackControllerTest extends ApiTestCase
         $this->assertEquals(201, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri()." ".$this->client->getResponse()->getContent());
         $this->assertContains((string)$data['miles'], $this->client->getResponse()->getContent());
         $this->assertTrue($this->client->getResponse()->headers->has('location'));
+        $this->assertTrue($this->client->getResponse()->headers->has('content-type'));
+        $this->assertEquals($this->client->getResponse()->headers->get('content-type'),"application/json");
+
         var_dump($this->client->getResponse()->getContent());
         var_dump($this->client->getResponse()->headers);
 

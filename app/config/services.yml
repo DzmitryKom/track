@@ -33,25 +33,3 @@ services:
     # AppBundle\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'
-
-    symfony.component.serializer.encoder.json_encoder:
-        class: Symfony\Component\Serializer\Encoder\JsonEncoder
-        tags:
-            - { name: serializer.encoder }
-
-    symfony.component.serializer.normalizer.object_normalizer:
-        class: Symfony\Component\Serializer\Normalizer\ObjectNormalizer
-        arguments: ['@?', '@?', '@form.property_accessor', '@doctrine.orm.default_entity_manager.property_info_extractor']
-        calls:
-            - [setSerializer, ['@symfony.component.serializer.serializer']]
-        tags:
-            - { name: serializer.normalizer }
-
-#    symfony.component.serializer.serializer:
-#        class: Symfony\Component\Serializer\Serializer
-#        arguments:
-#            - ['@symfony.component.serializer.encoder.json_encoder']
-#            - ['@symfony.component.serializer.normalizer.object_normalizer']
-#        tags:
-#            - { name: serializer.normalizer }
-#            - { name: serializer.encoder }
