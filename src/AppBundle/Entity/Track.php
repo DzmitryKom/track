@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Track
@@ -25,6 +26,8 @@ class Track
     private $id;
 
     /**
+     * @Assert\NotBlank(message = "Please enter Make")
+     *
      * @var string
      *
      * @ORM\Column(name="make", type="string", length=255)

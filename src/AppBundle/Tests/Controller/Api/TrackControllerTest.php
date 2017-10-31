@@ -33,8 +33,8 @@ class TrackControllerTest extends ApiTestCase
         $this->assertTrue($this->client->getResponse()->headers->has('content-type'));
         $this->assertEquals($this->client->getResponse()->headers->get('content-type'),"application/json");
 
-        var_dump($this->client->getResponse()->getContent());
-        var_dump($this->client->getResponse()->headers);
+//        var_dump($this->client->getResponse()->getContent());
+//        var_dump($this->client->getResponse()->headers);
 
         $crawler = $this->client->request('GET', $this->client->getResponse()->headers->get('location'),[],[],[]);
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri()." ".$this->client->getResponse()->getContent());
@@ -107,6 +107,65 @@ class TrackControllerTest extends ApiTestCase
 
     private function getTrack(){
         return $this->entityManager->getRepository('AppBundle:Track')->findOneBy([],['id'=>'ASC']);
+    }
+
+
+    public function testNewValidationsErrors()
+    {
+
+        $data = [
+            "model"=>'Diesel 456',
+            "bodyType"=>'van',
+            "miles"=>rand(0,2000000),
+        ];
+
+        $crawler = $this->client->request('POST', '/api/tracks/new',[],[],[], json_encode($data));
+
+
+        $this->assertEquals(400, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri()." ".$this->client->getResponse()->getContent());
+        $responseText = $this->client->getResponse()->getContent();
+
+        $this->assertJson($responseText);
+        $responseTextObject = json_decode($responseText);
+//        var_dump($responseTextObject);
+        $this->assertObjectHasAttribute('type',$responseTextObject);
+        $this->assertObjectHasAttribute('title',$responseTextObject);
+        $this->assertObjectHasAttribute('errors',$responseTextObject);
+        $this->assertObjectNotHasAttribute('model',$responseTextObject->errors);
+
+        $this->assertObjectHasAttribute('make',$responseTextObject->errors);
+        $this->assertEquals('Please enter Make',$responseTextObject->errors->make[0]);
+    }
+
+
+    public function testEditValidationsErrors()
+    {
+
+        $track = $this->getTrack();
+
+        $data = [
+            "make"=>null,
+            "model"=>'Diesel 4563',
+            "bodyType"=>'van',
+            "miles"=>rand(0,2000000),
+        ];
+
+        $crawler = $this->client->request('PUT', '/api/tracks/'.$track->getId().'/edit',[],[],[], json_encode($data));
+
+
+        $this->assertEquals(400, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri()." ".$this->client->getResponse()->getContent());
+        $responseText = $this->client->getResponse()->getContent();
+
+        $this->assertJson($responseText);
+        $responseTextObject = json_decode($responseText);
+//        var_dump($responseTextObject);
+        $this->assertObjectHasAttribute('type',$responseTextObject);
+        $this->assertObjectHasAttribute('title',$responseTextObject);
+        $this->assertObjectHasAttribute('errors',$responseTextObject);
+        $this->assertObjectNotHasAttribute('model',$responseTextObject->errors);
+
+        $this->assertObjectHasAttribute('make',$responseTextObject->errors);
+        $this->assertEquals('Please enter Make',$responseTextObject->errors->make[0]);
     }
 
 }

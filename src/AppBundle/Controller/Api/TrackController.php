@@ -11,16 +11,8 @@ namespace AppBundle\Controller\Api;
 use AppBundle\Entity\Track;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Track controller.
@@ -28,8 +20,10 @@ use Symfony\Component\Serializer\Serializer;
  * @Route("api/tracks")
  */
 
-class TrackController extends Controller
+class TrackController extends BaseController
 {
+
+
 
     /**
      * Creates a new track entity.
@@ -42,11 +36,13 @@ class TrackController extends Controller
         $track = new Track();
         $form = $this->createForm('AppBundle\Form\TrackType', $track);
         $this->processForm($request,$form);
-
+        if (! $form->isValid()){
+            return $this->createValidationErrorResponse($form);
+        }
         $em = $this->getDoctrine()->getManager();
         $em->persist($track);
         $em->flush();
-        return $this->setJsonResponse($track,201,$this->generateUrl('api_track_show', array('id' => $track->getId()),UrlGeneratorInterface::ABSOLUTE_PATH));
+        return $this->createApiResponse($track,201,$this->generateUrl('api_track_show', array('id' => $track->getId()),UrlGeneratorInterface::ABSOLUTE_PATH));
 
     }
 
@@ -59,7 +55,7 @@ class TrackController extends Controller
     public function showAction(Track $track)
     {
 
-        return $this->setJsonResponse($track);
+        return $this->createApiResponse($track);
     }
 
     /**
@@ -72,7 +68,7 @@ class TrackController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $tracks = $em->getRepository('AppBundle:Track')->findAll();
-        return $this->setJsonResponse(["tracks"=>$tracks, 'count'=>count($tracks)]);
+        return $this->createApiResponse(["tracks"=>$tracks, 'count'=>count($tracks)]);
     }
 
 
@@ -86,9 +82,11 @@ class TrackController extends Controller
     {
         $editForm = $this->createForm('AppBundle\Form\TrackType', $track);
         $this->processForm($request,$editForm);
-
+        if (! $editForm->isValid()){
+            return $this->createValidationErrorResponse($editForm);
+        }
         $this->getDoctrine()->getManager()->flush();
-        return $this->setJsonResponse($track,200,$this->generateUrl('api_track_show', array('id' => $track->getId()),UrlGeneratorInterface::ABSOLUTE_PATH));
+        return $this->createApiResponse($track,200,$this->generateUrl('api_track_show', array('id' => $track->getId()),UrlGeneratorInterface::ABSOLUTE_PATH));
     }
 
     /**
@@ -99,44 +97,14 @@ class TrackController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
-            $em = $this->getDoctrine()->getManager();
-            $track = $em->getRepository('AppBundle:Track')->find($id);
-            if($track){
-                $em->remove($track);
-                $em->flush();
-            }
-
-
-            return $this->setJsonResponse(null,204);
-
-    }
-
-    private function getDataBodyFromJsonRequest(Request $request){
-        $body = $request->getContent();
-        $data = json_decode($body,true);
-
-        if (!$data){
-            throw new Exception('Bad json');
+        $em = $this->getDoctrine()->getManager();
+        $track = $em->getRepository('AppBundle:Track')->find($id);
+        if($track){
+            $em->remove($track);
+            $em->flush();
         }
-        return $data;
-
+        return $this->createApiResponse(null,204);
     }
 
-    private function processForm(Request $request, Form $form){
-        $clearMissing = $request->getMethod() != 'PATCH';
-        $form->submit($this->getDataBodyFromJsonRequest($request),$clearMissing);
-    }
 
-    private function setJsonResponse($data,$statusCode = 200,$location=null){
-        $serializer = $this->get('serializer');
-        $jsonContent = $serializer->serialize($data, 'json');
-
-        $response = new Response($jsonContent,$statusCode);
-        $response->headers->set('Content-Type','application/json');
-        if ($location){
-            $response->headers->set('Location',$location);
-        }
-
-        return $response;
-    }
 }
