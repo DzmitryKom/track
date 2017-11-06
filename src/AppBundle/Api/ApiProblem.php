@@ -8,6 +8,8 @@
 
 namespace AppBundle\Api;
 
+use Symfony\Component\HttpFoundation\Response;
+
 
 class ApiProblem
 {
@@ -28,14 +30,23 @@ class ApiProblem
      * @param $statusCode
      * @param $type
      */
-    public function __construct($statusCode, $type)
+    public function __construct($statusCode, $type=null)
     {
         $this->statusCode = $statusCode;
-        $this->type = $type;
-        if (!isset(self::$titles[$type])){
-            throw new \InvalidArgumentException('Error: No title for type: '.$type);
+
+        if ($type === null){
+            $type='about:blank';
+            $title = isset(Response::$statusTexts[$statusCode]) ?
+                Response::$statusTexts[$statusCode] :
+                 'Unknown status code';
+        }else{
+            if (!isset(self::$titles[$type])){
+                throw new \InvalidArgumentException('Error: No title for type: '.$type);
+            }
+            $title =  self::$titles[$type];
         }
-        $this->title = self::$titles[$type];
+        $this->type = $type;
+        $this->title = $title;
     }
 
     public function toArray(){

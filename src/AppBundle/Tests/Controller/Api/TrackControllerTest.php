@@ -194,12 +194,56 @@ EOF;
         $this->assertEquals("application/problem+json",$this->client->getResponse()->headers->get('content-type'));
         $responseTextObject = json_decode($responseText);
         $this->assertObjectHasAttribute('type',$responseTextObject);
-        $this->assertEquals('invalid_body_format',$responseTextObject->type);
+        $this->assertContains('invalid_body_format',$responseTextObject->type);
 
 
         $this->assertObjectHasAttribute('title',$responseTextObject);
-        $this->assertObjectHasAttribute('type',$responseTextObject);
-        $this->assertEquals(ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT,$responseTextObject->type);
     }
+
+    public function test404()
+    {
+        $crawler = $this->client->request('PUT', '/api/tracks/'.'cd'.'/edit');
+
+
+        $this->assertEquals(404, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri().$this->getExceptionFromSymfonyExceptionResponse());
+        $responseText = (string)$this->client->getResponse()->getContent();
+//        var_dump($this->client->getResponse()->headers);
+//        var_dump($responseText);
+        $this->assertJson($responseText,$this->getExceptionFromSymfonyExceptionResponse());
+        $this->assertTrue($this->client->getResponse()->headers->has('content-type'));
+        $this->assertEquals("application/problem+json",$this->client->getResponse()->headers->get('content-type'));
+        $responseTextObject = json_decode($responseText);
+        $this->assertObjectHasAttribute('type',$responseTextObject);
+        $this->assertEquals('about:blank',$responseTextObject->type);
+        $this->assertObjectHasAttribute('title',$responseTextObject);
+        $this->assertEquals('Not Found',$responseTextObject->title);
+        $this->assertObjectHasAttribute('detail',$responseTextObject);
+
+
+
+    }
+
+    public function testNoRoute()
+    {
+        $crawler = $this->client->request('GET', '/api/tracks/'.'cd'.'/edit');
+
+
+        $this->assertEquals(405, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri().$this->getExceptionFromSymfonyExceptionResponse());
+        $responseText = (string)$this->client->getResponse()->getContent();
+//        var_dump($this->client->getResponse()->headers);
+//        var_dump($responseText);
+        $this->assertJson($responseText,$this->getExceptionFromSymfonyExceptionResponse());
+        $this->assertTrue($this->client->getResponse()->headers->has('content-type'));
+        $this->assertEquals("application/problem+json",$this->client->getResponse()->headers->get('content-type'));
+        $responseTextObject = json_decode($responseText);
+        $this->assertObjectHasAttribute('type',$responseTextObject);
+        $this->assertEquals('about:blank',$responseTextObject->type);
+        $this->assertObjectHasAttribute('title',$responseTextObject);
+        $this->assertObjectHasAttribute('detail',$responseTextObject);
+
+
+
+    }
+
 
 }
