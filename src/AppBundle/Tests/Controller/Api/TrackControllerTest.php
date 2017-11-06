@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller\Api;
 
+use AppBundle\Api\ApiProblem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TrackControllerTest extends ApiTestCase
@@ -157,6 +158,8 @@ class TrackControllerTest extends ApiTestCase
         $responseText = $this->client->getResponse()->getContent();
 
         $this->assertJson($responseText);
+        $this->assertTrue($this->client->getResponse()->headers->has('content-type'));
+        $this->assertEquals("application/problem+json",$this->client->getResponse()->headers->get('content-type'));
         $responseTextObject = json_decode($responseText);
 //        var_dump($responseTextObject);
         $this->assertObjectHasAttribute('type',$responseTextObject);
@@ -166,6 +169,37 @@ class TrackControllerTest extends ApiTestCase
 
         $this->assertObjectHasAttribute('make',$responseTextObject->errors);
         $this->assertEquals('Please enter Make',$responseTextObject->errors->make[0]);
+    }
+
+    public function testInvalidJson()
+    {
+
+        $track = $this->getTrack();
+
+        $invalidJsonData = <<<EOF
+{
+ "make":null
+            "model":'Diesel 4563',
+}
+EOF;
+        $crawler = $this->client->request('PUT', '/api/tracks/'.$track->getId().'/edit',[],[],[], $invalidJsonData);
+
+
+        $this->assertEquals(400, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri().$this->getExceptionFromSymfonyExceptionResponse());
+        $responseText = (string)$this->client->getResponse()->getContent();
+//        var_dump($this->client->getResponse()->headers);
+//        var_dump($responseText);
+        $this->assertJson($responseText,$this->getExceptionFromSymfonyExceptionResponse());
+        $this->assertTrue($this->client->getResponse()->headers->has('content-type'));
+        $this->assertEquals("application/problem+json",$this->client->getResponse()->headers->get('content-type'));
+        $responseTextObject = json_decode($responseText);
+        $this->assertObjectHasAttribute('type',$responseTextObject);
+        $this->assertEquals('invalid_body_format',$responseTextObject->type);
+
+
+        $this->assertObjectHasAttribute('title',$responseTextObject);
+        $this->assertObjectHasAttribute('type',$responseTextObject);
+        $this->assertEquals(ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT,$responseTextObject->type);
     }
 
 }

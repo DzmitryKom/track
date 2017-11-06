@@ -79,6 +79,20 @@ class ApiTestCase extends WebTestCase
         }
     }
 
+    protected function getExceptionFromSymfonyExceptionResponse($getPlain=false){
+        $responseText = $this->client->getResponse()->getContent();
+        if ($getPlain){
+            return $responseText;
+        }
+
+        $tt=substr($responseText,strpos($responseText, ' exception-message '), 250);
+
+        $startH1= strpos($tt,'</h1>');
+
+        $exception = substr($tt,20,$startH1-19);
+        return "\033[31m "."\n Exeption Message: ".$exception. " \033[0m";
+    }
+
 
  // @TODO 09 tests - clear data | see below
 

@@ -37,7 +37,7 @@ class TrackController extends BaseController
         $form = $this->createForm('AppBundle\Form\TrackType', $track);
         $this->processForm($request,$form);
         if (! $form->isValid()){
-            return $this->createValidationErrorResponse($form);
+            $this->throwAdiProblemValidationException($form);
         }
         $em = $this->getDoctrine()->getManager();
         $em->persist($track);
@@ -83,7 +83,7 @@ class TrackController extends BaseController
         $editForm = $this->createForm('AppBundle\Form\TrackType', $track);
         $this->processForm($request,$editForm);
         if (! $editForm->isValid()){
-            return $this->createValidationErrorResponse($editForm);
+            $this->throwAdiProblemValidationException($editForm);
         }
         $this->getDoctrine()->getManager()->flush();
         return $this->createApiResponse($track,200,$this->generateUrl('api_track_show', array('id' => $track->getId()),UrlGeneratorInterface::ABSOLUTE_PATH));

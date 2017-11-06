@@ -9,7 +9,9 @@
 namespace AppBundle\Controller\Api;
 
 
-use Exception;
+use AppBundle\Api\ApiProblem;
+use AppBundle\Api\ApiProblemException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -23,7 +25,8 @@ class BaseController extends Controller
         $data = json_decode($body,true);
 
         if (!$data){
-            throw new Exception('Bad json');
+            $apiProblem = new ApiProblem(400,ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT);
+            throw new ApiProblemException($apiProblem);
         }
         return $data;
 
@@ -34,12 +37,12 @@ class BaseController extends Controller
         $form->submit($this->getDataBodyFromJsonRequest($request),$clearMissing);
     }
 
-    protected function createApiResponse($data, $statusCode = 200, $location=null){
+    protected function createApiResponse($data, $statusCode = 200, $location=null,$contentType='application/json'){
         $serializer = $this->get('serializer');
         $jsonContent = $serializer->serialize($data, 'json');
 
         $response = new Response($jsonContent,$statusCode);
-        $response->headers->set('Content-Type','application/json');
+        $response->headers->set('Content-Type',$contentType);
         if ($location){
             $response->headers->set('Location',$location);
         }
@@ -62,16 +65,13 @@ class BaseController extends Controller
         return $errors;
     }
 
-
-    protected function createValidationErrorResponse(FormInterface $form){
+    protected function throwAdiProblemValidationException(FormInterface $form){
         $errors = $this->getErrorsFromForm($form);
-        $data = [
-            'type'=>'validation_error',
-            'title'=> 'There was a validation error',
-            'errors'=>$errors
 
-        ];
-        return $this->createApiResponse($data, 400);
+        $apiProblem = new ApiProblem(400,ApiProblem::TYPE_VALIDATION_ERROR);
+        $apiProblem->set('errors',$errors);
+
+        throw new ApiProblemException($apiProblem);
     }
 
     protected function createForm($type, $data = null, array $options = array())
