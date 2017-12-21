@@ -57,7 +57,7 @@ class ApiTestCase extends WebTestCase
     {
         self::$clientStatic = static::createClient();
         self::$clientStatic->followRedirects(true);
-        self::$clientStatic->setMaxRedirects(10);
+        self::$clientStatic->setMaxRedirects(3);
     }
 
     public function setup(){
@@ -68,15 +68,27 @@ class ApiTestCase extends WebTestCase
     }
 
     protected function createUser(array $data){
+        $userManager = $this->container->get('fos_user.user_manager');
+
+        if ($userManager->findUserBy(['email'=>$data['email']])){
+            return;
+        }
         $data = array_merge([
-            'planePassword'=>'password1'
+            'enabled'=>true,
         ], $data);
         $accessor = PropertyAccess::createPropertyAccessor();
-        $userManager = $this->container->get('fos_user.user_manager');
         $user = $userManager->createUser();
+        if (isset($data['password'])){
+            $user->setPlainPassword($data['password']);
+        }else{
+            $user->setPlainPassword('password1');
+        }
+
         foreach ($data as $key => $value){
             $accessor->setValue($user, $key, $value);
         }
+        $userManager->updateUser($user);
+        return;
     }
 
     protected function getExceptionFromSymfonyExceptionResponse($getPlain=false){

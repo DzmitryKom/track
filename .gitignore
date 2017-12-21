@@ -16,3 +16,4 @@
 /vendor/
 /content/bundles/
 .idea
+/app/config/parameters_jwt.yml

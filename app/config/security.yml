@@ -18,6 +18,31 @@ security:
             id: fos_user.user_provider.username_email
 
     firewalls:
+
+#        login:
+#            pattern:  ^/api/tokens
+#            stateless: true
+#            anonymous: true
+#            form_login:
+#                check_path:               /api/tokens/new
+#                success_handler:          lexik_jwt_authentication.handler.authentication_success
+#                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+#                require_previous_session: false
+#                provider: fos_userbundle
+
+        api:
+            pattern:   ^/api
+            anonymous: true
+            stateless: true
+#            form_login:
+#              check_path:               /api/tokens/new
+#              success_handler:          lexik_jwt_authentication.handler.authentication_success
+##              failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+#              require_previous_session: false
+#              provider: fos_userbundle
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
         main:
 
           remember_me:
@@ -38,6 +63,23 @@ security:
 
           logout:       true
           anonymous:    true
+#
+#        login:
+#            pattern:  ^/api/login
+#            stateless: true
+#            anonymous: true
+#            form_login:
+#                check_path:               /api/login_check
+#                success_handler:          lexik_jwt_authentication.handler.authentication_success
+#                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+#                require_previous_session: false
+#
+#        api:
+#            pattern:   ^/api
+#            stateless: true
+#            guard:
+#                authenticators:
+#                    - lexik_jwt_authentication.jwt_token_authenticator
 
 #          logout:
 #            path:   logout
@@ -50,8 +92,11 @@ security:
 
         - { path: ^/$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/loadinfo, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/tracks, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api, role: IS_AUTHENTICATED_ANONYMOUSLY }
+#        - { path: ^/tracks, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/login_check, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/tokens/new, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#        - { path: ^/api/new, roles: IS_AUTHENTICATED_FULLY  }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY  }
 
 
         - { path: ^/user, role: ROLE_MANAGER }

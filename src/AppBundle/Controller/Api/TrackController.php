@@ -33,6 +33,7 @@ class TrackController extends BaseController
      */
     public function newAction(Request $request)
     {
+        var_dump($this->getUser());
         $track = new Track();
         $form = $this->createForm('AppBundle\Form\TrackType', $track);
         $this->processForm($request,$form);
@@ -66,6 +67,8 @@ class TrackController extends BaseController
      */
     public function indexAction()
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $em = $this->getDoctrine()->getManager();
         $tracks = $em->getRepository('AppBundle:Track')->findAll();
         return $this->createApiResponse(["tracks"=>$tracks, 'count'=>count($tracks)]);

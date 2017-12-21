@@ -20,6 +20,14 @@ class TrackControllerTest extends ApiTestCase
     public function testNewAndShow()
     {
 
+        $token = $this->container->get('lexik_jwt_authentication.encoder')->encode(['username'=>'test1']);
+
+        $authHeaders = [
+            'HTTP_AUTHORIZATION' => 'Bearer '.$token,
+//            'Authorization' => 'Bearer '.$token,
+            'CONTENT_TYPE' => 'application/json',
+        ];
+
         $data = [
             "make"=>'Mercedes',
             "model"=>'Diesel 456',
@@ -27,7 +35,7 @@ class TrackControllerTest extends ApiTestCase
             "miles"=>rand(0,2000000),
         ];
 
-        $crawler = $this->client->request('POST', '/api/tracks/new',[],[],[], json_encode($data));
+        $crawler = $this->client->request('POST', '/api/tracks/new',[],[],$authHeaders, json_encode($data));
         $this->assertEquals(201, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri()." ".$this->client->getResponse()->getContent());
         $this->assertContains((string)$data['miles'], $this->client->getResponse()->getContent());
         $this->assertTrue($this->client->getResponse()->headers->has('location'));
@@ -37,7 +45,7 @@ class TrackControllerTest extends ApiTestCase
 //        var_dump($this->client->getResponse()->getContent());
 //        var_dump($this->client->getResponse()->headers);
 
-        $crawler = $this->client->request('GET', $this->client->getResponse()->headers->get('location'),[],[],[]);
+        $crawler = $this->client->request('GET', $this->client->getResponse()->headers->get('location'),[],[],$authHeaders);
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri()." ".$this->client->getResponse()->getContent());
         $this->assertContains((string)$data['miles'], $this->client->getResponse()->getContent());
 
@@ -241,8 +249,20 @@ EOF;
         $this->assertObjectHasAttribute('title',$responseTextObject);
         $this->assertObjectHasAttribute('detail',$responseTextObject);
 
+    }
 
+    public function testRequiresAuth()
+    {
 
+        $crawler = $this->client->request('GET', '/api/tracks',[],[],[
+
+        ]);
+
+        $this->assertEquals(401, $this->client->getResponse()->getStatusCode(), "Unexpected HTTP status code for: ".$crawler->getUri().$this->getExceptionFromSymfonyExceptionResponse());
+        $responseText = (string)$this->client->getResponse()->getContent();
+//        $responseTextObject = json_decode($responseText);
+//                var_dump($this->client->getResponse()->headers);
+        var_dump($responseText);
     }
 
 

@@ -62,7 +62,7 @@ class ApiExeptionSubscriber implements EventSubscriberInterface
         if ($data['type'] != 'about:blank'){
             $data['type'] = 'http//dsfskh/erors/#'.$data['type'];
         }
-
+//       @TODO urls error
 
         $response = new JsonResponse($data,$apiProblem->getStatusCode());
         $response->headers->set('Content-Type','application/problem+json');
